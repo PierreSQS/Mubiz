@@ -60,11 +60,32 @@ public class BlockTable {
 
   public void createTable() throws SQLException {
     String createString =
-      "create table COFFEES " + "(COF_NAME varchar(32) NOT NULL, " +
-      "SUP_ID int NOT NULL, " + "PRICE numeric(10,2) NOT NULL, " +
-      "SALES integer NOT NULL, " + "TOTAL integer NOT NULL, " +
-      "PRIMARY KEY (COF_NAME), " +
-      "FOREIGN KEY (SUP_ID) REFERENCES SUPPLIERS (SUP_ID))";
+      "CREATE TABLE Block "+
+         "(hash VARCHAR(80)  PRIMARY KEY,"+
+    	 "confirmations VARCHAR(40),"+
+    	 "strippedsize INT,"+
+    	 "size VARCHAR(40),"+
+    	 "weight VARCHAR(40),"+
+    	 "height INT,"+
+    	 "version VARCHAR(40),"+
+    	 "versionHex VARCHAR(40),"+
+    	 "merkleroot VARCHAR(80),"+
+ //   	 "tx VARCHAR(),"+
+    	 "time VARCHAR(40),"+
+    	 "mediantime VARCHAR(40),"+
+    	 "nonce VARCHAR(40),"+
+    	 "bits VARCHAR(40),"+
+    	 "difficulty VARCHAR(40),"+
+    	 "chainwork VARCHAR(80),"+
+    	 "previousblockhash VARCHAR(80),"+
+    	 "nextblockhash VARCHAR(80))";   	 
+      
+    		
+//      "create table COFFEES " + "(COF_NAME varchar(32) NOT NULL, " +
+//      "SUP_ID int NOT NULL, " + "PRICE numeric(10,2) NOT NULL, " +
+//      "SALES integer NOT NULL, " + "TOTAL integer NOT NULL, " +
+//      "PRIMARY KEY (COF_NAME), " +
+//      "FOREIGN KEY (SUP_ID) REFERENCES SUPPLIERS (SUP_ID))";
     Statement stmt = null;
     try {
       stmt = con.createStatement();
@@ -98,16 +119,16 @@ public class BlockTable {
   }
 
 
-  public void updateBLOCKales(HashMap<String, Integer> salesForWeek) throws SQLException {
+  public void updateBLOCKTableOptional(HashMap<String, Integer> salesForWeek) throws SQLException {
 
     PreparedStatement updateSales = null;
     PreparedStatement updateTotal = null;
 
     String updateString =
-      "update COFFEES " + "set SALES = ? where COF_NAME = ?";
+      "update BLOCK " + "set SALES = ? where COF_NAME = ?";
 
     String updateStatement =
-      "update COFFEES " + "set TOTAL = TOTAL + ? where COF_NAME = ?";
+      "update BLOCK " + "set TOTAL = TOTAL + ? where COF_NAME = ?";
 
     try {
       con.setAutoCommit(false);
@@ -141,96 +162,55 @@ public class BlockTable {
     }
   }
 
-  public void modifyPrices(float percentage) throws SQLException {
+  public void insertRow(String hash, 
+		  				String confirmation,
+		  				int strippedsize,
+		  				String size , 
+	    				String weight,
+	    				int height , 
+	    				String version , 
+	    				String versionHex , 
+	    				String merkleroot , 
+//	    				String tx, 
+	    				String time , 
+	    				String mediantime , 
+	    				String nonce , 
+	    				String bits , 
+	    				String difficulty , 
+	    				String chainwork , 
+	    				String previousblockhash , 
+	    				String nextblockhash) throws SQLException 
+  {
     Statement stmt = null;
     try {
       stmt =
           con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-      ResultSet uprs = stmt.executeQuery("SELECT * FROM COFFEES");
-
-      while (uprs.next()) {
-        float f = uprs.getFloat("PRICE");
-        uprs.updateFloat("PRICE", f * percentage);
-        uprs.updateRow();
-      }
-
-    } catch (SQLException e) {
-      MySQLUtilities.printSQLException(e);
-    } finally {
-      if (stmt != null) { stmt.close(); }
-    }
-  }
-
-
-  public void modifyPricesByPercentage(String coffeeName, float priceModifier,
-                                       float maximumPrice) throws SQLException {
-    con.setAutoCommit(false);
-
-    Statement getPrice = null;
-    Statement updatePrice = null;
-    ResultSet rs = null;
-    String query =
-      "SELECT COF_NAME, PRICE FROM COFFEES " + "WHERE COF_NAME = '" +
-      coffeeName + "'";
-
-    try {
-      Savepoint save1 = con.setSavepoint();
-      getPrice =
-          con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-      updatePrice = con.createStatement();
-
-      if (!getPrice.execute(query)) {
-        System.out.println("Could not find entry for coffee named " +
-                           coffeeName);
-      } else {
-        rs = getPrice.getResultSet();
-        rs.first();
-        float oldPrice = rs.getFloat("PRICE");
-        float newPrice = oldPrice + (oldPrice * priceModifier);
-        System.out.println("Old price of " + coffeeName + " is " + oldPrice);
-        System.out.println("New price of " + coffeeName + " is " + newPrice);
-        System.out.println("Performing update...");
-        updatePrice.executeUpdate("UPDATE COFFEES SET PRICE = " + newPrice +
-                                  " WHERE COF_NAME = '" + coffeeName + "'");
-        System.out.println("\nBLOCK table after update:");
-        BlockTable.viewTable(con);
-        if (newPrice > maximumPrice) {
-          System.out.println("\nThe new price, " + newPrice +
-                             ", is greater than the maximum " + "price, " +
-                             maximumPrice +
-                             ". Rolling back the transaction...");
-          con.rollback(save1);
-          System.out.println("\nBLOCK table after rollback:");
-          BlockTable.viewTable(con);
-        }
-        con.commit();
-      }
-    } catch (SQLException e) {
-      MySQLUtilities.printSQLException(e);
-    } finally {
-      if (getPrice != null) { getPrice.close(); }
-      if (updatePrice != null) { updatePrice.close(); }
-      con.setAutoCommit(true);
-    }
-  }
-
-
-  public void insertRow(String coffeeName, int supplierID, float price,
-                        int sales, int total) throws SQLException {
-    Statement stmt = null;
-    try {
-      stmt =
-          con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-      ResultSet uprs = stmt.executeQuery("SELECT * FROM COFFEES");
+      ResultSet uprs = stmt.executeQuery("SELECT * FROM BLOCK");
 
       uprs.moveToInsertRow();
 
-      uprs.updateString("COF_NAME", coffeeName);
-      uprs.updateInt("SUP_ID", supplierID);
-      uprs.updateFloat("PRICE", price);
-      uprs.updateInt("SALES", sales);
-      uprs.updateInt("TOTAL", total);
-
+      uprs.updateString("hash", hash);
+      uprs.updateString("confirmations", confirmation);
+      uprs.updateInt("strippedsize", strippedsize);
+      uprs.updateString("size", size);
+      uprs.updateString("weight", weight);
+      uprs.updateInt("height", height);
+      uprs.updateString("version", version);
+      uprs.updateString("versionHex", versionHex);
+      uprs.updateString("merkleroot", merkleroot);
+//      uprs.updateString("tx", tx);
+      
+      uprs.updateString("time", time);
+      uprs.updateString("mediantime", mediantime);
+      uprs.updateString("nonce", nonce);
+      uprs.updateString("bits", bits);
+      uprs.updateString("difficulty", difficulty);
+      uprs.updateString("chainwork", chainwork);
+      uprs.updateString("previousblockhash", previousblockhash);
+      uprs.updateString("nextblockhash", nextblockhash);
+      
+      //uprs.updateFloat("PRICE", price);
+      
       uprs.insertRow();
       uprs.beforeFirst();
 
@@ -249,15 +229,19 @@ public class BlockTable {
       this.con.setAutoCommit(false);
       stmt = this.con.createStatement();
 
-      stmt.addBatch("INSERT INTO COFFEES " +
-                    "VALUES('Amaretto', 49, 9.99, 0, 0)");
-      stmt.addBatch("INSERT INTO COFFEES " +
-                    "VALUES('Hazelnut', 49, 9.99, 0, 0)");
-      stmt.addBatch("INSERT INTO COFFEES " +
-                    "VALUES('Amaretto_decaf', 49, 10.99, 0, 0)");
-      stmt.addBatch("INSERT INTO COFFEES " +
-                    "VALUES('Hazelnut_decaf', 49, 10.99, 0, 0)");
-
+      stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+              "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0818' , '266','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
+      
+      stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+              "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0819' , '267','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
+      stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+              "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0820' , '268','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
+      stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+              "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0821' , '269','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
+      
+//      stmt.addBatch("INSERT INTO COFFEES " +
+//                    "VALUES('Hazelnut', 49, 9.99, 0, 0)");
+   
       int[] updateCounts = stmt.executeBatch();
       this.con.commit();
 
@@ -273,19 +257,41 @@ public class BlockTable {
   
   public static void viewTable(Connection con) throws SQLException {
     Statement stmt = null;
-    String query = "select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES";
+    String query = "select * from BLOCK";
     try {
       stmt = con.createStatement();
       ResultSet rs = stmt.executeQuery(query);
 
       while (rs.next()) {
-        String coffeeName = rs.getString("COF_NAME");
-        int supplierID = rs.getInt("SUP_ID");
-        float price = rs.getFloat("PRICE");
-        int sales = rs.getInt("SALES");
-        int total = rs.getInt("TOTAL");
-        System.out.println(coffeeName + ", " + supplierID + ", " + price +
-                           ", " + sales + ", " + total);
+    	String hash = rs.getString("hash");
+    	String confirmations = rs.getString("confirmations");
+    	int strippedsize = rs.getInt("strippedsize");
+    	String size = rs.getString("size");
+    	String weight = rs.getString("weight");
+    	int height = rs.getInt("height");
+    	String version = rs.getString("version");
+    	String versionHex = rs.getString("versionHex");
+    	String merkleroot = rs.getString("merkleroot");
+//    	String tx = rs.getString("tx");
+    	String time = rs.getString("time");
+    	String mediantime = rs.getString("mediantime");
+    	String nonce = rs.getString("nonce");
+    	String bits = rs.getString("bits");
+    	String difficulty = rs.getString("difficulty");
+    	String chainwork = rs.getString("chainwork");
+    	String previousblockhash = rs.getString("previousblockhash");
+    	String nextblockhash = rs.getString("nextblockhash");
+    	
+//    	float price = rs.getFloat("PRICE");
+        System.out.println("Block#"+hash);
+    	System.out.println(hash + ", " + confirmations + ", " + strippedsize +
+                           ", " + size + ", " + weight+
+                           ", " + height+", " + version+ 
+                           ", " + versionHex+ ", " + merkleroot+
+//                           ", " + tx+
+                           ", " + time+", " + mediantime+", " + 
+                           ", "+nonce+", "+bits+", "+difficulty+
+                           ", "+chainwork+", "+previousblockhash+", "+nextblockhash);
       }
 
     } catch (SQLException e) {
@@ -297,7 +303,7 @@ public class BlockTable {
 
   public static void alternateViewTable(Connection con) throws SQLException {
     Statement stmt = null;
-    String query = "select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES";
+    String query = "select * from COFFEES";
     try {
       stmt = con.createStatement();
       ResultSet rs = stmt.executeQuery(query);
@@ -320,7 +326,7 @@ public class BlockTable {
   public Set<String> getKeys() throws SQLException {
     HashSet<String> keys = new HashSet<String>();
     Statement stmt = null;
-    String query = "select COF_NAME from COFFEES";
+    String query = "select hash from BLOCK";
     try {
       stmt = con.createStatement();
       ResultSet rs = stmt.executeQuery(query);
@@ -342,10 +348,8 @@ public class BlockTable {
     try {
       stmt = con.createStatement();
       if (this.dbms.equals("mysql")) {
-        stmt.executeUpdate("DROP TABLE IF EXISTS COFFEES");
-      } else if (this.dbms.equals("derby")) {
-        stmt.executeUpdate("DROP TABLE COFFEES");
-      }
+        stmt.executeUpdate("DROP TABLE IF EXISTS BLOCK");
+      } 
     } catch (SQLException e) {
       MySQLUtilities.printSQLException(e);
     } finally {
@@ -382,46 +386,64 @@ public class BlockTable {
 //                                             myMySQLUtilities.dbName,
 //                                             myMySQLUtilities.dbms);
 
-      BlockTable myCoffeeTable =
+      BlockTable myBlockTable =
         new BlockTable(myConnection, myMySQLUtilities.dbName,
                          myMySQLUtilities.dbms);
 
-      System.out.println("\nContents of COFFEES table:");
+      System.out.println("\nContents of BLOCK table:");
       BlockTable.viewTable(myConnection);
 
-      System.out.println("\nRaising coffee prices by 25%");
-      myCoffeeTable.modifyPrices(1.25f);
+//      System.out.println("\nRaising coffee prices by 25%");
+//      myCoffeeTable.modifyPrices(1.25f);
+//
+      System.out.println("\nInserting a new row in Table BLOCK:");
+      myBlockTable.insertRow("000000000000000000c62e4871a59ba372dfb27c6fbc038b21ec9c4a96243259", 
+				 "1",
+				 998189,
+				 "998189",
+				 "3992756",
+				 454641,
+				 "536870914",
+				 "20000002",
+				 "60fad08048df5212cd1fd21ad60c87541a48e57bf832e9dab67c5d3dca752773",
+				 "1488024093", 
+				 "1488021960", 
+				 "1963317726", 
+				 "18027e93", 
+				 "440779902286.5892", 
+				 "00000000000000000000000000000000000000000041949f2bccb9048b88e888", 
+				 "00000000000000000235fcb0dd78a6c5155ee1e207bc14e8b893bb1122604a87",
+				 "0000000000000000003477efce8cecd5ce7c62f5768aee466ed8b8f9a236dbcc");
 
-      System.out.println("\nInserting a new row:");
-      myCoffeeTable.insertRow("Kona", 150, 10.99f, 0, 0);
-      BlockTable.viewTable(myConnection);
-
-      System.out.println("\nUpdating sales of coffee per week:");
-      HashMap<String, Integer> salesCoffeeWeek =
-        new HashMap<String, Integer>();
-      salesCoffeeWeek.put("Colombian", 175);
-      salesCoffeeWeek.put("French_Roast", 150);
-      salesCoffeeWeek.put("Espresso", 60);
-      salesCoffeeWeek.put("Colombian_Decaf", 155);
-      salesCoffeeWeek.put("French_Roast_Decaf", 90);
-      myCoffeeTable.updateBLOCKales(salesCoffeeWeek);
-      BlockTable.viewTable(myConnection);
-
-      System.out.println("\nModifying prices by percentage");
-
-      myCoffeeTable.modifyPricesByPercentage("Colombian", 0.10f, 9.00f);
       
-      System.out.println("\nBLOCK table after modifying prices by percentage:");
-      
       BlockTable.viewTable(myConnection);
 
-      System.out.println("\nPerforming batch updates; adding new COFFEES");
-      myCoffeeTable.batchUpdate();
+//      System.out.println("\nUpdating sales of coffee per week:");
+//      HashMap<String, Integer> salesCoffeeWeek =
+//        new HashMap<String, Integer>();
+//      salesCoffeeWeek.put("Colombian", 175);
+//      salesCoffeeWeek.put("French_Roast", 150);
+//      salesCoffeeWeek.put("Espresso", 60);
+//      salesCoffeeWeek.put("Colombian_Decaf", 155);
+//      salesCoffeeWeek.put("French_Roast_Decaf", 90);
+//      myCoffeeTable.updateBLOCKales(salesCoffeeWeek);
+//      BlockTable.viewTable(myConnection);
+//
+//      System.out.println("\nModifying prices by percentage");
+//
+//      myCoffeeTable.modifyPricesByPercentage("Colombian", 0.10f, 9.00f);
+//      
+//      System.out.println("\nBLOCK table after modifying prices by percentage:");
+//      
+//      BlockTable.viewTable(myConnection);
+
+      System.out.println("\nPerforming batch updates; adding new BLOCKS");
+      myBlockTable.batchUpdate();
       BlockTable.viewTable(myConnection);
 
 //      System.out.println("\nDropping Block table:");
 //      
-//      myCoffeeTable.dropTable();
+//      myBlockTable.dropTable();
 
     } catch (SQLException e) {
       MySQLUtilities.printSQLException(e);
