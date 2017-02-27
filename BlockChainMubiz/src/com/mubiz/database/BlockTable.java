@@ -81,11 +81,6 @@ public class BlockTable {
     	 "nextblockhash VARCHAR(80))";   	 
       
     		
-//      "create table COFFEES " + "(COF_NAME varchar(32) NOT NULL, " +
-//      "SUP_ID int NOT NULL, " + "PRICE numeric(10,2) NOT NULL, " +
-//      "SALES integer NOT NULL, " + "TOTAL integer NOT NULL, " +
-//      "PRIMARY KEY (COF_NAME), " +
-//      "FOREIGN KEY (SUP_ID) REFERENCES SUPPLIERS (SUP_ID))";
     Statement stmt = null;
     try {
       stmt = con.createStatement();
@@ -121,28 +116,28 @@ public class BlockTable {
 
   public void updateBLOCKTableOptional(HashMap<String, Integer> salesForWeek) throws SQLException {
 
-    PreparedStatement updateSales = null;
-    PreparedStatement updateTotal = null;
+    PreparedStatement updateConfirmations = null;
+    PreparedStatement updateDifficulty = null;
 
     String updateString =
-      "update BLOCK " + "set SALES = ? where COF_NAME = ?";
+      "update BLOCK " + "set confirmation = ? where hash = ?";
 
     String updateStatement =
-      "update BLOCK " + "set TOTAL = TOTAL + ? where COF_NAME = ?";
+      "update BLOCK " + "set difficulty = difficulty + ? where COF_NAME = ?";
 
     try {
       con.setAutoCommit(false);
-      updateSales = con.prepareStatement(updateString);
-      updateTotal = con.prepareStatement(updateStatement);
+      updateConfirmations = con.prepareStatement(updateString);
+      updateDifficulty = con.prepareStatement(updateStatement);
 
       for (Map.Entry<String, Integer> e : salesForWeek.entrySet()) {
-        updateSales.setInt(1, e.getValue().intValue());
-        updateSales.setString(2, e.getKey());
-        updateSales.executeUpdate();
+        updateConfirmations.setInt(1, e.getValue().intValue());
+        updateConfirmations.setString(2, e.getKey());
+        updateConfirmations.executeUpdate();
 
-        updateTotal.setInt(1, e.getValue().intValue());
-        updateTotal.setString(2, e.getKey());
-        updateTotal.executeUpdate();
+        updateDifficulty.setInt(1, e.getValue().intValue());
+        updateDifficulty.setString(2, e.getKey());
+        updateDifficulty.executeUpdate();
         con.commit();
       }
     } catch (SQLException e) {
@@ -156,13 +151,13 @@ public class BlockTable {
         }
       }
     } finally {
-      if (updateSales != null) { updateSales.close(); }
-      if (updateTotal != null) { updateTotal.close(); }
+      if (updateConfirmations != null) { updateConfirmations.close(); }
+      if (updateDifficulty != null) { updateDifficulty.close(); }
       con.setAutoCommit(true);
     }
   }
 
-  public void insertRow(String hash, 
+  public void insertRow(String hash,
 		  				String confirmation,
 		  				int strippedsize,
 		  				String size , 
@@ -239,8 +234,6 @@ public class BlockTable {
       stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
               "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0821' , '269','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
       
-//      stmt.addBatch("INSERT INTO COFFEES " +
-//                    "VALUES('Hazelnut', 49, 9.99, 0, 0)");
    
       int[] updateCounts = stmt.executeBatch();
       this.con.commit();
@@ -303,18 +296,37 @@ public class BlockTable {
 
   public static void alternateViewTable(Connection con) throws SQLException {
     Statement stmt = null;
-    String query = "select * from COFFEES";
+    String query = "select * from BLOCK";
     try {
       stmt = con.createStatement();
       ResultSet rs = stmt.executeQuery(query);
       while (rs.next()) {
-        String coffeeName = rs.getString(1);
-        int supplierID = rs.getInt(2);
-        float price = rs.getFloat(3);
-        int sales = rs.getInt(4);
-        int total = rs.getInt(5);
-        System.out.println(coffeeName + ", " + supplierID + ", " + price +
-                           ", " + sales + ", " + total);
+        String hash = rs.getString(1);
+        String confirmations = rs.getString(2);
+        int strippedsize = rs.getInt(3);
+        String size = rs.getString(4);
+        String weight = rs.getString(5);
+        int height = rs.getInt(6);
+        String version = rs.getString(7);
+        String versionHex = rs.getString(8);
+        String merkleroot = rs.getString(9);
+//        String tx = rs.getString(10);
+        String time = rs.getString(11);
+        String mediantime = rs.getString(12);
+        String nonce = rs.getString(13);
+        String bits = rs.getString(14);
+        String difficulty = rs.getString(15);
+        String chainwork = rs.getString(16);
+        String previousblockhash = rs.getString(17);
+        String nextblockhash = rs.getString(18);
+
+        System.out.println(hash + ", " + confirmations + ", " + strippedsize +
+        				   ", " +size + ", " + weight + ", " + height +
+        				   ", " +version + ", " + versionHex + ", " + merkleroot +
+//        				   ", " +tx+
+        				   ", " +time + ", " + mediantime + ", " + nonce +
+                           ", " + bits + ", " + difficulty+", "+chainwork+
+                           ", " + previousblockhash + ", " + nextblockhash);
       }
     } catch (SQLException e) {
       MySQLUtilities.printSQLException(e);
@@ -377,14 +389,6 @@ public class BlockTable {
     try {
       myConnection = myMySQLUtilities.getConnection();
 
-      // Java DB does not have an SQL create database command; it does require createDatabase
-//      MySQLUtilities.createDatabase(myConnection,
-//                                           myMySQLUtilities.dbName,
-//                                           myMySQLUtilities.dbms);
-//
-//      MySQLUtilities.initializeTables(myConnection,
-//                                             myMySQLUtilities.dbName,
-//                                             myMySQLUtilities.dbms);
 
       BlockTable myBlockTable =
         new BlockTable(myConnection, myMySQLUtilities.dbName,
@@ -418,24 +422,6 @@ public class BlockTable {
       
       BlockTable.viewTable(myConnection);
 
-//      System.out.println("\nUpdating sales of coffee per week:");
-//      HashMap<String, Integer> salesCoffeeWeek =
-//        new HashMap<String, Integer>();
-//      salesCoffeeWeek.put("Colombian", 175);
-//      salesCoffeeWeek.put("French_Roast", 150);
-//      salesCoffeeWeek.put("Espresso", 60);
-//      salesCoffeeWeek.put("Colombian_Decaf", 155);
-//      salesCoffeeWeek.put("French_Roast_Decaf", 90);
-//      myCoffeeTable.updateBLOCKales(salesCoffeeWeek);
-//      BlockTable.viewTable(myConnection);
-//
-//      System.out.println("\nModifying prices by percentage");
-//
-//      myCoffeeTable.modifyPricesByPercentage("Colombian", 0.10f, 9.00f);
-//      
-//      System.out.println("\nBLOCK table after modifying prices by percentage:");
-//      
-//      BlockTable.viewTable(myConnection);
 
       System.out.println("\nPerforming batch updates; adding new BLOCKS");
       myBlockTable.batchUpdate();
