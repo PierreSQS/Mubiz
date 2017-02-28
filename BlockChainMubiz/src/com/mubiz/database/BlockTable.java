@@ -42,6 +42,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.mubiz.dao.Block;
+
 public class BlockTable {
 
   private String dbName;
@@ -164,24 +166,7 @@ public class BlockTable {
     }
   }
 
-  public void insertRow(String hash,
-			String confirmation,
-			int strippedsize,
-			String size,
-			String weight,
-			int height,
-			String version,
-			String versionHex,
-			String merkleroot, 
-//	    		String tx,
-			String time,
-			String mediantime,
-			String nonce,
-			String bits,
-			String difficulty,
-			String chainwork,
-			String previousblockhash,
-			String nextblockhash) throws SQLException 
+  public void insertRow(Block block) throws SQLException 
   {
     Statement stmt = null;
     try {
@@ -191,25 +176,25 @@ public class BlockTable {
 
       uprs.moveToInsertRow();
 
-      uprs.updateString("hash", hash);
-      uprs.updateString("confirmations", confirmation);
-      uprs.updateInt("strippedsize", strippedsize);
-      uprs.updateString("size", size);
-      uprs.updateString("weight", weight);
-      uprs.updateInt("height", height);
-      uprs.updateString("version", version);
-      uprs.updateString("versionHex", versionHex);
-      uprs.updateString("merkleroot", merkleroot);
+      uprs.updateString("hash", block.getHash());
+      uprs.updateString("confirmations", block.getConfirmations());
+      uprs.updateInt("strippedsize", block.getStrippedsize());
+      uprs.updateString("size", block.getSize());
+      uprs.updateString("weight", block.getWeight());
+      uprs.updateInt("height", block.getHeight());
+      uprs.updateString("version", block.getVersion());
+      uprs.updateString("versionHex", block.getVersionHex());
+      uprs.updateString("merkleroot", block.getMerkleroot());
 //      uprs.updateString("tx", tx);
       
-      uprs.updateString("time", time);
-      uprs.updateString("mediantime", mediantime);
-      uprs.updateString("nonce", nonce);
-      uprs.updateString("bits", bits);
-      uprs.updateString("difficulty", difficulty);
-      uprs.updateString("chainwork", chainwork);
-      uprs.updateString("previousblockhash", previousblockhash);
-      uprs.updateString("nextblockhash", nextblockhash);
+      uprs.updateString("time", block.getTime());
+      uprs.updateString("mediantime", block.getMediantime());
+      uprs.updateString("nonce", block.getNonce());
+      uprs.updateString("bits", block.getBits());
+      uprs.updateString("difficulty", block.getDifficulty());
+      uprs.updateString("chainwork", block.getChainwork());
+      uprs.updateString("previousblockhash", block.getPreviousblockhash());
+      uprs.updateString("nextblockhash", block.getNextblockhash());
       
       //uprs.updateFloat("PRICE", price);
       
@@ -407,9 +392,7 @@ public class BlockTable {
       System.out.println("\nPopulating BLOCK table with Test Data");
       myBlockTable.populateTable();
       
-
-      System.out.println("\nInserting a new row in Table BLOCK:");
-      myBlockTable.insertRow("000000000000000000c62e4871a59ba372dfb27c6fbc038b21ec9c4a96243259", 
+      Block block = new Block("000000000000000000c62e4871a59ba372dfb27c6fbc038b21ec9c4a96243259", 
 				 "1",
 				 998189,
 				 "998189",
@@ -426,6 +409,10 @@ public class BlockTable {
 				 "00000000000000000000000000000000000000000041949f2bccb9048b88e888", 
 				 "00000000000000000235fcb0dd78a6c5155ee1e207bc14e8b893bb1122604a87",
 				 "0000000000000000003477efce8cecd5ce7c62f5768aee466ed8b8f9a236dbcc");
+      
+
+      System.out.println("\nInserting a new row in Table BLOCK:");
+      myBlockTable.insertRow(block);
 
       
       BlockTable.viewTable(myConnection);
