@@ -10,9 +10,12 @@ import com.mubiz.dao.Block;
 
 public class MubizWSClient {
 	public static void main(String[] args) throws ClientProtocolException, IOException {
+		
+		MubizHttpClient myMubizHttpClient = new MubizHttpClient();
 
-		String responseBody = new MubizHttpClient(MubizHttpClient.MUBIZ_BLOC_HASH_URL
-				+ "000000000000000000207a44417907a44175fc9152dc05b901d180a68fe42070/").connectToWS();
+		
+		String responseBody = myMubizHttpClient.connectToWS(MubizHttpClient.MUBIZ_BLOC_HASH_URL
+				+ "000000000000000000207a44417907a44175fc9152dc05b901d180a68fe42070/");
 		
 
 		MubizJsonParser.deserializeRespFromJSON(responseBody, Block.class);
