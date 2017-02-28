@@ -165,23 +165,23 @@ public class BlockTable {
   }
 
   public void insertRow(String hash,
-		  				String confirmation,
-		  				int strippedsize,
-		  				String size , 
-	    				String weight,
-	    				int height , 
-	    				String version , 
-	    				String versionHex , 
-	    				String merkleroot , 
-//	    				String tx, 
-	    				String time , 
-	    				String mediantime , 
-	    				String nonce , 
-	    				String bits , 
-	    				String difficulty , 
-	    				String chainwork , 
-	    				String previousblockhash , 
-	    				String nextblockhash) throws SQLException 
+			String confirmation,
+			int strippedsize,
+			String size,
+			String weight,
+			int height,
+			String version,
+			String versionHex,
+			String merkleroot, 
+//	    		String tx,
+			String time,
+			String mediantime,
+			String nonce,
+			String bits,
+			String difficulty,
+			String chainwork,
+			String previousblockhash,
+			String nextblockhash) throws SQLException 
   {
     Statement stmt = null;
     try {
@@ -317,7 +317,7 @@ public class BlockTable {
         String version = rs.getString(7);
         String versionHex = rs.getString(8);
         String merkleroot = rs.getString(9);
-//        String tx = rs.getString(10);
+//      String tx = rs.getString(10);
         String time = rs.getString(11);
         String mediantime = rs.getString(12);
         String nonce = rs.getString(13);
@@ -328,12 +328,12 @@ public class BlockTable {
         String nextblockhash = rs.getString(18);
 
         System.out.println(hash + ", " + confirmations + ", " + strippedsize +
-        				   ", " +size + ", " + weight + ", " + height +
-        				   ", " +version + ", " + versionHex + ", " + merkleroot +
-//        				   ", " +tx+
-        				   ", " +time + ", " + mediantime + ", " + nonce +
-                           ", " + bits + ", " + difficulty+", "+chainwork+
-                           ", " + previousblockhash + ", " + nextblockhash);
+        		          ", " +size + ", " + weight + ", " + height +
+        		          ", " +version + ", " + versionHex + ", " + merkleroot +
+//        		          ", " +tx+
+			          ", " +time + ", " + mediantime + ", " + nonce +
+			          ", " + bits + ", " + difficulty+", "+chainwork+
+			          ", " + previousblockhash + ", " + nextblockhash);
       }
     } catch (SQLException e) {
       MySQLUtilities.printSQLException(e);
