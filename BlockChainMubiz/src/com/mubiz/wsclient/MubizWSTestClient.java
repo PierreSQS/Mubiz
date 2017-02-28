@@ -43,9 +43,10 @@ public class MubizWSTestClient {
 		String blockResp = myMubizHttpClient
 				.connectToWS(MubizHttpClient.MUBIZ_BLOC_HASH_URL + hash.getBlock_hash() + "/");
 		
-		Block block = MubizJsonParser.deserializeRespFromJSON(blockResp, Block.class);
+		Block block = MubizJsonParser.deserializeRespFromJSON(blockResp, Block.class);		
 		
-		System.out.println(block);
+		System.out.println("inserting block :"+block);
+		myBlockTable.insertRow(block);
 	}
 
 }
