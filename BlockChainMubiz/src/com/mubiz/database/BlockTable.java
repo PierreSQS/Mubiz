@@ -36,7 +36,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,16 +95,24 @@ public class BlockTable {
     Statement stmt = null;
     try {
       stmt = con.createStatement();
-      stmt.executeUpdate("insert into COFFEES " +
-                         "values('Colombian', 00101, 7.99, 0, 0)");
-      stmt.executeUpdate("insert into COFFEES " +
-                         "values('French_Roast', 00049, 8.99, 0, 0)");
-      stmt.executeUpdate("insert into COFFEES " +
-                         "values('Espresso', 00150, 9.99, 0, 0)");
-      stmt.executeUpdate("insert into COFFEES " +
-                         "values('Colombian_Decaf', 00101, 8.99, 0, 0)");
-      stmt.executeUpdate("insert into COFFEES " +
-                         "values('French_Roast_Decaf', 00049, 9.99, 0, 0)");
+      stmt.executeUpdate("insert into BLOCK " +
+                         "(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+                         "values ('000000000000000001b4bea1fdc7fdc0df119a5cdb52e88f914f90a505f89436' , '1','998202','998202','3992808','455161','536870914','pierrottest','d77311ab249ad94c414d0b2a467976d52229ce5eadef072424ab6d5d43637190')");
+      
+      stmt.executeUpdate("insert into BLOCK " +
+                         "(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+                         "values ('00000000000000000053f5b44e0f7325aae817288a2c5c2a45b9da8dc0674ba5' , '1','998135','998135','3992540','455152','536870914','pierrottest','3269f91f966762974ab7f74d9ac374fb9b1fc409f4e5900f9b4013796e0b2a83')");
+     
+      stmt.executeUpdate("insert into BLOCK " +
+                         "(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+                         "values ('0000000000000000011d05921074441ee3902d8dc0bd3849dcd44191ea90a4f0' , '3','999959','999959','3999836','455153','536870912','pierrottest','af5c75d81322758d3956ee72341c9e4c6751d2b7e8e0382560f4968bf445a4b8')");
+      
+      stmt.executeUpdate("insert into BLOCK " +
+                         "(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+                         "values ('0000000000000000000a37f63c3966e9d247738d25b7325c31379812a54054ea' , '11','998162','998162','3992648','455145','536870912','pierrottest','61c3edc4c8d4f8691beee58081b5f958295ca8299006c1e30e10cbae239adeb4')");
+      stmt.executeUpdate("insert into BLOCK " +
+                         "(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
+                         "values ('000000000000000000751bd118d586d9e908f45ef9046194365de072e8adde70' , '10','998254','998254','3993016','455150','536870914','pierrottest','109bf5b0d918ef1f1a4a53a4f02e2526259e8acfbaf9109fcfd8b03ae71dfc70')");
     } catch (SQLException e) {
       MySQLUtilities.printSQLException(e);
     } finally {
@@ -397,9 +404,10 @@ public class BlockTable {
       System.out.println("\nContents of BLOCK table:");
       BlockTable.viewTable(myConnection);
 
-//      System.out.println("\nRaising coffee prices by 25%");
-//      myCoffeeTable.modifyPrices(1.25f);
-//
+      System.out.println("\nPopulating BLOCK table with Test Data");
+      myBlockTable.populateTable();
+      
+
       System.out.println("\nInserting a new row in Table BLOCK:");
       myBlockTable.insertRow("000000000000000000c62e4871a59ba372dfb27c6fbc038b21ec9c4a96243259", 
 				 "1",
