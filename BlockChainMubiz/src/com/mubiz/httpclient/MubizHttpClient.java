@@ -12,24 +12,28 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 public class MubizHttpClient {
-	private String url;
+	//private String url;
 
 	public final static String MUBIZ_ROOT_URL = "http://bitcoin.mubiz.com/";
 	public final static String MUBIZ_BLOCKS_URL = MUBIZ_ROOT_URL + "blocks/";
 	public final static String MUBIZ_BLOCK_INDEX_URL = MUBIZ_ROOT_URL + "block_index/";
 	public final static String MUBIZ_BLOC_HASH_URL = MUBIZ_ROOT_URL + "block_hash/";
-
-	public MubizHttpClient(String url) {
-		super();
-		this.url = url;
-		System.out.println("\nthe called URL: " + url);
+	
+	public MubizHttpClient(){
+		
 	}
 
-	public String connectToWS() throws ClientProtocolException, IOException {
+//	public MubizHttpClient(String url) {
+//		super();
+//		this.url = url;
+//		System.out.println("\nthe called URL: " + url);
+//	}
+//
+	public String connectToWS(String url) throws ClientProtocolException, IOException {
 
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			HttpGet httpget = new HttpGet(this.url);
+			HttpGet httpget = new HttpGet(url);
 
 			System.out.println("\nExecuting request " + httpget.getRequestLine());
 
