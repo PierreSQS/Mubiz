@@ -8,7 +8,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.mubiz.dao.Block;
 import com.mubiz.dao.Hash;
-import com.mubiz.dao.NumberOfBlock;
+import com.mubiz.dao.NumberOfBlocks;
 import com.mubiz.database.BlockTable;
 import com.mubiz.database.MySQLUtilities;
 import com.mubiz.httpclient.MubizHttpClient;
@@ -29,24 +29,33 @@ public class MubizWSTestClient {
 		BlockTable myBlockTable = new BlockTable(myConnection, myMySQLUtilities.dbName, myMySQLUtilities.dbms);
 
 		// get total number of blocks or the highest index
-		String blockIndexMax = myMubizHttpClient.connectToWS(MubizHttpClient.MUBIZ_BLOCKS_URL);
+		String blocksResp = myMubizHttpClient.connectToWS(MubizHttpClient.MUBIZ_BLOCKS_URL);
 
-		NumberOfBlock blocksCounter = MubizJsonParser.deserializeRespFromJSON(blockIndexMax, NumberOfBlock.class);
+		NumberOfBlocks blocksCounter = MubizJsonParser.deserializeRespFromJSON(blocksResp, NumberOfBlocks.class);
 
-		// get hash
-		String hashResp = myMubizHttpClient
-				.connectToWS(MubizHttpClient.MUBIZ_BLOCK_INDEX_URL + blocksCounter.getBlocks() + "/");
-
-		Hash hash = MubizJsonParser.deserializeRespFromJSON(hashResp, Hash.class);
-
-		// get block data
-		String blockResp = myMubizHttpClient
-				.connectToWS(MubizHttpClient.MUBIZ_BLOC_HASH_URL + hash.getBlock_hash() + "/");
 		
-		Block block = MubizJsonParser.deserializeRespFromJSON(blockResp, Block.class);		
+		int totalBlocks = blocksCounter.getBlocks();
 		
-		System.out.println("inserting block :"+block);
-		myBlockTable.insertRow(block);
+		System.out.println("the number of blocks actually: "+totalBlocks);
+		
+		
+
+//		for (int i = 1; i <= totalBlocks; i++) {
+		
+		for (int i = 1; i <= 2000; i++) {
+
+//		for (int i = 1; i <= totalBlocks; i++) {
+			// get JSON Hash from WS
+			String hashResp = myMubizHttpClient.connectToWS(MubizHttpClient.MUBIZ_BLOCK_INDEX_URL + i + "/");
+			Hash hash = MubizJsonParser.deserializeRespFromJSON(hashResp, Hash.class);
+			System.out.println("the data of the Block (block#" + i + ")");
+			// get block data
+			String blockResp = myMubizHttpClient
+					.connectToWS(MubizHttpClient.MUBIZ_BLOC_HASH_URL + hash.getBlock_hash() + "/");
+			Block block = MubizJsonParser.deserializeRespFromJSON(blockResp, Block.class);
+			System.out.println("inserting block : block#" + i);
+			myBlockTable.insertRow(block);
+		}
 	}
 
 }
