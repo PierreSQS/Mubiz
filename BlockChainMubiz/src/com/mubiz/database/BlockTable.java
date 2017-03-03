@@ -166,47 +166,70 @@ public class BlockTable {
     }
   }
 
-  public void insertRow(Block block) throws SQLException 
-  {
-    Statement stmt = null;
-    try {
-      stmt =
-          con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-      ResultSet uprs = stmt.executeQuery("SELECT * FROM BLOCK");
+	public static int getNumberOfRecord(Connection con) throws SQLException {
+		Statement stmt = null;
+		int records = 0;
+		String query = "select count(*) from BLOCK";
+		try {
+			stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				records = rs.getInt(1);
 
-      uprs.moveToInsertRow();
+				System.out.printf("the number of records in TABLE BLOCK: %s.%n%n ", records);
+			}
 
-      uprs.updateString("hash", block.getHash());
-      uprs.updateString("confirmations", block.getConfirmations());
-      uprs.updateInt("strippedsize", block.getStrippedsize());
-      uprs.updateString("size", block.getSize());
-      uprs.updateString("weight", block.getWeight());
-      uprs.updateInt("height", block.getHeight());
-      uprs.updateString("version", block.getVersion());
-      uprs.updateString("versionHex", block.getVersionHex());
-      uprs.updateString("merkleroot", block.getMerkleroot());
-//      uprs.updateString("tx", tx);
-      
-      uprs.updateString("time", block.getTime());
-      uprs.updateString("mediantime", block.getMediantime());
-      uprs.updateString("nonce", block.getNonce());
-      uprs.updateString("bits", block.getBits());
-      uprs.updateString("difficulty", block.getDifficulty());
-      uprs.updateString("chainwork", block.getChainwork());
-      uprs.updateString("previousblockhash", block.getPreviousblockhash());
-      uprs.updateString("nextblockhash", block.getNextblockhash());
-      
-      //uprs.updateFloat("PRICE", price);
-      
-      uprs.insertRow();
-      uprs.beforeFirst();
+		} catch (SQLException e) {
+			MySQLUtilities.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return records;
+	}
 
-    } catch (SQLException e) {
-      MySQLUtilities.printSQLException(e);
-    } finally {
-      if (stmt != null) { stmt.close(); }
-    }
-  }
+	public void insertRow(Block block) throws SQLException {
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			ResultSet uprs = stmt.executeQuery("SELECT * FROM BLOCK");
+
+			uprs.moveToInsertRow();
+
+			uprs.updateString("hash", block.getHash());
+			uprs.updateString("confirmations", block.getConfirmations());
+			uprs.updateInt("strippedsize", block.getStrippedsize());
+			uprs.updateString("size", block.getSize());
+			uprs.updateString("weight", block.getWeight());
+			uprs.updateInt("height", block.getHeight());
+			uprs.updateString("version", block.getVersion());
+			uprs.updateString("versionHex", block.getVersionHex());
+			uprs.updateString("merkleroot", block.getMerkleroot());
+			// uprs.updateString("tx", tx);
+
+			uprs.updateString("time", block.getTime());
+			uprs.updateString("mediantime", block.getMediantime());
+			uprs.updateString("nonce", block.getNonce());
+			uprs.updateString("bits", block.getBits());
+			uprs.updateString("difficulty", block.getDifficulty());
+			uprs.updateString("chainwork", block.getChainwork());
+			uprs.updateString("previousblockhash", block.getPreviousblockhash());
+			uprs.updateString("nextblockhash", block.getNextblockhash());
+
+			// uprs.updateFloat("PRICE", price);
+
+			uprs.insertRow();
+			uprs.beforeFirst();
+
+		} catch (SQLException e) {
+			MySQLUtilities.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+	}
 
   public void batchUpdate() throws SQLException {
 
@@ -226,8 +249,10 @@ public class BlockTable {
       stmt.addBatch("INSERT INTO BLOCK " +"(hash, confirmations, strippedsize, size, weight, height,version, versionHex, merkleroot)"+
               "VALUES ('0000000000000000021252bdd31542c06ed522ebef2bed1b3605d29b601c0821' , '269','998036','998036','3992144','453616','536870912','20000000','804560392e7417a08e93188200573a55fb1ec5e1d29ce36fb0b4d78ee4e74bde')");
       
-   
-      int[] updateCounts = stmt.executeBatch();
+//      Not necessary to store the result in variable since variable not in use   
+//      int[] updateCounts = stmt.executeBatch();
+      
+      stmt.executeBatch();
       this.con.commit();
 
     } catch (BatchUpdateException b) {
@@ -413,14 +438,17 @@ public class BlockTable {
 
       System.out.println("\nInserting a new row in Table BLOCK:");
       myBlockTable.insertRow(block);
-
       
       BlockTable.viewTable(myConnection);
-
 
       System.out.println("\nPerforming batch updates; adding new BLOCKS");
       myBlockTable.batchUpdate();
       BlockTable.viewTable(myConnection);
+      
+      System.out.println("\nCounting the Records in Table BLOCK:");
+      BlockTable.getNumberOfRecord(myConnection);
+      
+//      BlockTable.viewTable(myConnection);      
 
 //      System.out.println("\nDropping Block table:");
 //      
