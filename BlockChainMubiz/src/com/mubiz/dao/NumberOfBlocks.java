@@ -1,7 +1,7 @@
 package com.mubiz.dao;
 
 public class NumberOfBlocks {
-	int blocks;
+	private int blocks;
 
 	public int getBlocks() {
 		return blocks;

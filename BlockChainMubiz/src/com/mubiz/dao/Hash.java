@@ -1,7 +1,7 @@
 package com.mubiz.dao;
 
 public class Hash {
-	String block_hash;
+	private String block_hash;
 
 	public String getBlock_hash() {
 		return block_hash;
