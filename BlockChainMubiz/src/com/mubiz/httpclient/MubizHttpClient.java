@@ -17,7 +17,7 @@ public class MubizHttpClient {
 	public final static String MUBIZ_ROOT_URL = "http://bitcoin.mubiz.com/";
 	public final static String MUBIZ_BLOCKS_URL = MUBIZ_ROOT_URL + "blocks/";
 	public final static String MUBIZ_BLOCK_INDEX_URL = MUBIZ_ROOT_URL + "block_index/";
-	public final static String MUBIZ_BLOC_HASH_URL = MUBIZ_ROOT_URL + "block_hash/";
+	public final static String MUBIZ_BLOCK_HASH_URL = MUBIZ_ROOT_URL + "block_hash/";
 	
 	public MubizHttpClient(){
 		
