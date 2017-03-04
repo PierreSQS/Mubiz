@@ -63,7 +63,7 @@ public class MubizWSClient {
 
 			// get block data
 			String blockResp = myMubizHttpClient
-					.connectToWS(MubizHttpClient.MUBIZ_BLOC_HASH_URL + hash.getBlock_hash() + "/");
+					.connectToWS(MubizHttpClient.MUBIZ_BLOCK_HASH_URL + hash.getBlock_hash() + "/");
 			Block block = MubizJsonParser.deserializeRespFromJSON(blockResp, Block.class);
 			System.out.println("inserting block : block#" + i);
 			myBlockTable.insertRow(block);
