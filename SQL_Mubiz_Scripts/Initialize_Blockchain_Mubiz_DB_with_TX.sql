@@ -5,7 +5,7 @@ use Blockchain_MubizDB;
 SET NAMES utf8;
 
 CREATE TABLE Block (
-   hash VARCHAR(80)  PRIMARY KEY, 
+   hash VARCHAR(80) PRIMARY KEY, 
    confirmations VARCHAR(40),
    strippedsize INT,
    size VARCHAR(40),
