@@ -124,6 +124,10 @@ public class Block {
 	public String getNextblockhash() {
 		return nextblockhash;
 	}
+	
+	public String txAsString(){
+		return Arrays.toString(tx);
+	}
 
 	@Override
 	public String toString() {
