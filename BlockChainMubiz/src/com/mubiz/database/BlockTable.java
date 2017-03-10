@@ -206,8 +206,7 @@ public class BlockTable {
 			uprs.updateString("version", block.getVersion());
 			uprs.updateString("versionHex", block.getVersionHex());
 			uprs.updateString("merkleroot", block.getMerkleroot());
-			// uprs.updateString("tx", tx);
-
+			uprs.updateString("tx", block.txAsString());
 			uprs.updateString("time", block.getTime());
 			uprs.updateString("mediantime", block.getMediantime());
 			uprs.updateString("nonce", block.getNonce());
@@ -217,7 +216,7 @@ public class BlockTable {
 			uprs.updateString("previousblockhash", block.getPreviousblockhash());
 			uprs.updateString("nextblockhash", block.getNextblockhash());
 
-			// uprs.updateFloat("PRICE", price);
+//			uprs.updateFloat("PRICE", price);
 
 			uprs.insertRow();
 			uprs.beforeFirst();
