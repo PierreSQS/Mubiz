@@ -48,7 +48,7 @@ public class MubizWSClient {
 		System.out.println("the number of blocks actually in the DB: " + actualBlocksInDB);
 
 		// just for test purposes
-		for (long i = actualBlocksInWS; i > actualBlocksInWS - 100; i--) {
+		for (long i = actualBlocksInWS; i > actualBlocksInWS - 40; i--) {
 //		for (long i = 160; i > actualBlocksInDB; i--) {
 
 			// CAUTION!! the loop should only insert the blocks which are new to
